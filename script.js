@@ -1,59 +1,115 @@
 // jshint browser:true, eqeqeq:true, undef:true, devel:true, esversion: 8
 
-// CONSTANTE QUI CONTIENT LE CHEMIN DU JSON
-const JSON_FILE = "save.json";
-
-// elt du dom
-const BUTTONPLAY = document.getElementById("formButtonPlay");
-
-// MAP
-const SIDE_CASE = 20;
-const EMPTY = 0;
-const SNAKE = 1;
-const FOOD = 2;
-const WALL = 3;
-let WORLD;
-
-
 (function()
 {
-	BUTTONPLAY.addEventListener("click", play);
+	// JSON
+	const JSON_FILE = "save.json";
+	
+	// ELT DU DOM
+	const BUTTONPLAY = document.getElementById("formButtonPlay");
+	
+	// MAP
+	const SIDE_CASE = 20;
+	const EMPTY = 0;
+	const SNAKE = 1;
+	const FOOD = 2;
+	const WALL = 3;
+	let WORLD;
 
-	/**
-	 * @param 	{String} field 	Champs que l'on souhaite trouver dans le JSON
-	 * @param 	{String} src   	Chemin vers le JSON
-	 * @return 	{String}		Champs recherché dans le JSON
-	 */
-	function getFieldJSON(field, src)
-	{
-		fetch(src)
-			.then((response) => response.json())
-			.then((data) => {
-				console.log(data.niveaux[0][field]);
-				return data.niveaux[0][field];
-			})
-			.catch((error) => {
-				console.error('Error :', error);
-			});
-	}	
+	// SNAKE
+	let SNAKEBODY;
+
+
+	BUTTONPLAY.addEventListener("click", play);
 
 	function play()
 	{
-		let sizeGrid = getFieldJSON("dimension", JSON_FILE);
-		initGrid(sizeGrid);
+
+		// init the game
+		document.addEventListener("keydown", snakeDirection);
+
+		let levelJson;
+		(async function(){
+			try
+			{
+				let jsonFile = await fetch(JSON_FILE);
+
+				if (jsonFile.ok)
+				{
+					let levelChose = document.getElementById("level").value;
+					let levels = jsonFile.json.levels;
+					for (let level of levels)
+					{
+						if (level.level === levelChose)
+						{
+							levelJson = level;
+						}
+					}
+				}
+				else
+				{
+					throw("Err " + jsonFile.status);
+				}
+			}
+			catch(e)
+			{
+				console.log(e);
+			}
+		})();
+		initGrid(levelJson);
 	}
 
-	function initGrid(sizeGrid)
+	function initGrid(levelJson)
 	{
-		let size = sizeGrid[0];
-		for (let i = 0; i < size; i++)
+		
+		// empty grid
+		let sizeGrid = levelJson.dimension;
+		for (let i = 0; i < sizeGrid; i++)
 		{
-			for (let j = 0; j < size; j++)
+			for (let j = 0; j < sizeGrid; j++)
 			{
 				WORLD[i][j] = EMPTY;
 			}
 		}
+
+		// walls
+		let nbWall = levelJson.walls;
+		for (let i = 0; i < nbWall; i++)
+		{
+			// case vide
+			let x = Math.floor(Math.random() * sizeGrid);
+			let y = Math.floor(Math.random() * sizeGrid);
+			while (WORLD[x][y] !== EMPTY)
+			{
+				x = Math.floor(Math.random() * sizeGrid);
+				y = Math.floor(Math.random() * sizeGrid);
+			}
+
+			WORLD[x][y] = WALL;
+		}
+
+		// apple
+		generateApple();
+
+		// snake
+		let x = Math.floor(Math.random() * (sizeGrid - 2) + 1);
+		let y = Math.floor(Math.random() * (sizeGrid - 2) + 1);
+		
 	}
 
+	function moveDirection()
+	{
+		// TODO
+	}
+
+	function drawCanva()
+	{
+		// TODO
+	}
+
+	function generateApple()
+	{
+		// TODO
+	}
 })();
 		
