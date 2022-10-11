@@ -1,0 +1,20 @@
+
+
+
+
+
+
+/* Formulaire paramètre du jeu */
+#paras
+{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+}
+
+#formButtonPlay
+{
+    display: flex;
+    justify-content: space-evenly;
+}
