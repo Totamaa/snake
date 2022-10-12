@@ -7,37 +7,53 @@
 	
 	// ELT DU DOM
 	const BUTTONPLAY = document.getElementById("formButtonPlay");
-	
+	const INPUTCOLOR = document.getElementById("colorSnake");
+	const CANVAS = document.getElementById("boardGame");
+
 	// MAP
-	const SIDE_CASE = 20;
+	const CASESIDE = 20; // size on one case in px
 	const EMPTY = 0;
 	const SNAKE = 1;
 	const FOOD = 2;
 	const WALL = 3;
-	let WORLD;
+	let world; // map of the world
 
 	// SNAKE
-	let SNAKEBODY;
+	let snakeBody; // tab of snake position
+	let snakeDirection = [1, 0]; // direction vecteur of the snake
 
-
+	// COLOR
+	const RED = "#FF0000";
+	const GREY = "AAAAAA";
+	const WHITE = "FFFFFF";
+	
+	// play
 	BUTTONPLAY.addEventListener("click", play);
 
+	
+	
+	/**
+	 * function call when we want to play
+	 */
 	function play()
 	{
-
 		// init the game
-		document.addEventListener("keydown", snakeDirection);
+		document.addEventListener("keydown", moveDirection);
 
 		let levelJson;
 		(async function(){
 			try
 			{
+				console.log(JSON_FILE);
 				let jsonFile = await fetch(JSON_FILE);
+				console.log(JSON_FILE);
 
 				if (jsonFile.ok)
 				{
 					let levelChose = document.getElementById("level").value;
-					let levels = jsonFile.json.levels;
+					let levelsJson = await jsonFile.json();
+					let levels = levelsJson.levels;
+
 					for (let level of levels)
 					{
 						if (level.level === levelChose)
@@ -45,6 +61,8 @@
 							levelJson = level;
 						}
 					}
+					console.log(levelJson);
+					initGrid(levelJson);
 				}
 				else
 				{
@@ -56,7 +74,6 @@
 				console.log(e);
 			}
 		})();
-		initGrid(levelJson);
 	}
 
 	function initGrid(levelJson)
@@ -68,9 +85,24 @@
 		{
 			for (let j = 0; j < sizeGrid; j++)
 			{
-				WORLD[i][j] = EMPTY;
+				world[i][j] = EMPTY;
 			}
 		}
+
+		// snake position (can not be on a side)
+		let x = Math.floor(Math.random() * (sizeGrid - 2) + 1); 
+		let y = Math.floor(Math.random() * (sizeGrid - 2) + 1);
+
+		// snake direction (don't go to a side)
+		if (x < sizeGrid / 2)
+		{
+			snakeDirection[0] = 1;
+		}
+		else
+		{
+			snakeDirection[0] = -1;
+		}
+
 
 		// walls
 		let nbWall = levelJson.walls;
@@ -79,37 +111,116 @@
 			// case vide
 			let x = Math.floor(Math.random() * sizeGrid);
 			let y = Math.floor(Math.random() * sizeGrid);
-			while (WORLD[x][y] !== EMPTY)
+			let casesSide = [[x+1, y], [x-1, y], [x, y+1], [x, y-1]];
+			let caseSideFree = true;
+			for (let caseSide of casesSide)
+			{
+				if (world[caseSide[0]][caseSide[1]] !== EMPTY)
+				{
+					caseSideFree = false;
+				}
+			}
+
+			while (world[x][y] !== EMPTY && caseSideFree)
 			{
 				x = Math.floor(Math.random() * sizeGrid);
 				y = Math.floor(Math.random() * sizeGrid);
 			}
 
-			WORLD[x][y] = WALL;
+			world[x][y] = WALL;
 		}
 
 		// apple
-		generateApple();
+		generateApple(levelJson.dimension);
 
-		// snake
-		let x = Math.floor(Math.random() * (sizeGrid - 2) + 1);
-		let y = Math.floor(Math.random() * (sizeGrid - 2) + 1);
+		// draw the board
+		drawCanva(levelJson.dimension);
+
 		
 	}
 
-	function moveDirection()
+	function moveDirection(evt)
 	{
-		// TODO
+		let touch = evt.key;
+		if (touch === "ArrowUp")
+		{
+			if (snakeDirection[1] !== 1)
+			{
+				snakeDirection = [0, -1];
+			}
+		}
+		else if (touch === "ArrowDown")
+		{
+			if (snakeDirection[1] !== -1)
+			{
+				snakeDirection = [0, 1];
+			}
+		}
+		else if (touch === "ArrowRight")
+		{
+			if (snakeDirection[0] !== -1)
+			{
+				snakeDirection = [1, 0];
+			}
+		}
+		else if (touch === "ArrowLeft")
+		{
+			if (snakeDirection[0] !== 1)
+			{
+				snakeDirection = [0, -1];
+			}
+		}
 	}
 
-	function drawCanva()
+	function drawCanva(sizeGrid)
 	{
-		// TODO
+		let colorSnake = INPUTCOLOR.value;
+		let colorFood = RED;
+		let colorWall = GREY;
+		let colorEmpty = WHITE;
+
+		let ctx = CANVAS.getContext('2d');
+
+		for (let i = 0; i < sizeGrid; i++)
+		{
+			for (let j = 0; j < sizeGrid; j++)
+			{
+				if (world[i][j] === EMPTY)
+				{
+					ctx.fillStyle = colorEmpty;
+					ctx.fillRect(i * CASESIDE, j * CASESIDE, CASESIDE, CASESIDE);
+				}
+				if (world[i][j] === SNAKE)
+				{
+					ctx.fillStyle = colorSnake;
+					ctx.fillRect(i * CASESIDE, j * CASESIDE, CASESIDE, CASESIDE);
+				}
+				if (world[i][j] === FOOD)
+				{
+					ctx.fillStyle = colorFood;
+					ctx.fillRect(i * CASESIDE, j * CASESIDE, CASESIDE, CASESIDE);
+				}
+				if (world[i][j] === WALL)
+				{
+					ctx.fillStyle = colorWall;
+					ctx.fillRect(i * CASESIDE, j * CASESIDE, CASESIDE, CASESIDE);
+				}
+			}
+		}
+
 	}
 
-	function generateApple()
+	function generateApple(sizeGrid)
 	{
-		// TODO
+		let x = Math.floor(Math.random() * sizeGrid);
+		let y = Math.floor(Math.random() * sizeGrid);
+		while (world[x][y] !== EMPTY)
+		{
+			x = Math.floor(Math.random() * sizeGrid);
+			y = Math.floor(Math.random() * sizeGrid);
+		}
+
+		world[x][y] = FOOD;
 	}
 })();
 		
