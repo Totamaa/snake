@@ -28,7 +28,45 @@
 	const WHITE = "FFFFFF";
 	
 	// play
-	BUTTONPLAY.addEventListener("click", play);
+	BUTTONPLAY.addEventListener("click", function(){
+		// init the game
+		document.addEventListener("keydown", moveDirection);
+
+		let levelJson;
+		(async function(){
+			try
+			{
+				console.log(JSON_FILE);
+				let jsonFile = await fetch(JSON_FILE);
+				console.log(JSON_FILE);
+
+				if (jsonFile.ok)
+				{
+					let levelChose = document.getElementById("level").value;
+					let levelsJson = await jsonFile.json();
+					let levels = levelsJson.levels;
+
+					for (let level of levels)
+					{
+						if (level.level === levelChose)
+						{
+							levelJson = level;
+						}
+					}
+					console.log(levelJson);
+					initGrid(levelJson);
+				}
+				else
+				{
+					throw("Err " + jsonFile.status);
+				}
+			}
+			catch(e)
+			{
+				console.log(e);
+			}
+		})();
+	});
 
 	
 	
