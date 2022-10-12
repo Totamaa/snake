@@ -4,43 +4,19 @@
             "level" : 1,
             "dimension": 20,
             "delay": 200,
-            "walls": 0,
-            "food": [
-                [10, 10]
-            ],
-            "snake": [
-                [60,60],
-                [60,59],
-                [60,58]
-            ]
+            "walls": 0
         },
         {
             "level" : 2,
             "dimension": 15,
             "delay": 200,
-            "walls": 3,
-            "food": [
-                [10, 10]
-            ],
-            "snake": [
-                [60,60],
-                [60,59],
-                [60,58]
-            ]
+            "walls": 3
         },
         {
             "level" : 3,
             "dimension": 10,
             "delay": 200,
-            "walls": 5,
-            "food": [
-                [10, 10]
-            ],
-            "snake": [
-                [60,60],
-                [60,59],
-                [60,58]
-            ]
+            "walls": 5
         }
     ]
 }

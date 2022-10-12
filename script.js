@@ -1,17 +1,18 @@
-// jshint browser:true, eqeqeq:true, undef:true, devel:true, esversion: 8
+// jshint browser:true, eqeqeq:true, undef:true, devel:true, esversion: 9
 
 (function()
 {
 	// JSON
-	const JSON_FILE = "save.json";
+	const JSON_FILE = "./save.json";
 	
-	// ELT DU DOM
+	// ELT DOM
 	const BUTTONPLAY = document.getElementById("formButtonPlay");
 	const INPUTCOLOR = document.getElementById("colorSnake");
 	const CANVAS = document.getElementById("boardGame");
+	const FORMPARA = document.getElementById("formPara");
 
 	// MAP
-	const CASESIDE = 20; // size on one case in px
+	const CASESIDE = 20; // size of one case in px
 	const EMPTY = 0;
 	const SNAKE = 1;
 	const FOOD = 2;
@@ -28,47 +29,48 @@
 	const WHITE = "FFFFFF";
 	
 	// play
-	BUTTONPLAY.addEventListener("click", function(){
+	BUTTONPLAY.addEventListener("click", play2);
+
+	function play2()
+	{
 		// init the game
+		CANVAS.classList.toggle("hidden");
+		FORMPARA.classList.toggle("hidden");
+
 		document.addEventListener("keydown", moveDirection);
 
 		let levelJson;
-		(async function(){
-			try
+
+		fetch(JSON_FILE)
+			.then(function(response)
 			{
-				console.log(JSON_FILE);
-				let jsonFile = await fetch(JSON_FILE);
-				console.log(JSON_FILE);
-
-				if (jsonFile.ok)
+				if (response.ok)
 				{
-					let levelChose = document.getElementById("level").value;
-					let levelsJson = await jsonFile.json();
-					let levels = levelsJson.levels;
-
-					for (let level of levels)
-					{
-						if (level.level === levelChose)
-						{
-							levelJson = level;
-						}
-					}
-					console.log(levelJson);
-					initGrid(levelJson);
+					levelJson = response.json();
 				}
 				else
 				{
-					throw("Err " + jsonFile.status);
+					throw ("Err: " + response.status);
 				}
-			}
-			catch(e)
-			{
-				console.log(e);
-			}
-		})();
-	});
+			})
+			.then(function(levelJson){
+				let levelChose = document.getElementById("level").value;
+				let levels = levelJson.levels;
 
-	
+				for (let level of levels)
+				{
+					if (level.level === levelChose)
+					{
+						levelJson = level;
+					}
+				}
+				console.log(levelJson);
+				initGrid(levelJson);
+			})
+			.catch(function(err){
+				console.log(err);
+			});
+	}
 	
 	/**
 	 * function call when we want to play
@@ -76,6 +78,9 @@
 	function play()
 	{
 		// init the game
+		CANVAS.classList.toggle("hidden");
+		FORMPARA.classList.toggle("hidden");
+
 		document.addEventListener("keydown", moveDirection);
 
 		let levelJson;
@@ -174,6 +179,8 @@
 		// draw the board
 		drawCanva(levelJson.dimension);
 
+		setInterval(levelJson.delay, loopGame);
+
 		
 	}
 
@@ -260,5 +267,12 @@
 
 		world[x][y] = FOOD;
 	}
+
+	function loopGame()
+	{
+
+		CANVAS.classList.toggle("hidden");
+	}
+
 })();
 		

@@ -1,9 +1,5 @@
 
 
-
-
-
-
 /* Formulaire paramètre du jeu */
 #paras
 {
@@ -17,4 +13,9 @@
 {
     display: flex;
     justify-content: space-evenly;
+}
+
+.hidden
+{
+    visibility: hidden;
 }
