@@ -3,7 +3,7 @@
         {
             "level" : 1,
             "dimension": 20,
-            "delay": 200,
+            "delay": 250,
             "walls": 0
         },
         {
@@ -15,7 +15,7 @@
         {
             "level" : 3,
             "dimension": 10,
-            "delay": 200,
+            "delay": 150,
             "walls": 5
         }
     ]

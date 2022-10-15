@@ -9,7 +9,7 @@
 <body>
     <!-- paramètres du jeu -->
     <h1>Snake</h1>
-    <form id="formPara">
+    <div id="paraPage">
         <div id="paras">
             <div id="formLevel">
                 <label for="level">Niveau
@@ -29,12 +29,30 @@
         <div id="formButtonPlay">
             <button>Jouer</button>
         </div>
-    </form>
+        <div id="score">
+            <p class="itemScore">Dernier score</p>
+            <p id="lastScore" class="itemScore">0</p>
+            <p class="itemScore">Meilleur score</p>
+            <p id="bestScore" class="itemScore">0</p>
+        </div>
+    </div>
 
     <!-- jeu -->
-    <canvas id="boardGame">
+    <div id="gamePage" class="hidden">
+        <canvas id="boardGame" width="" height="">
         
-    </canvas>
+        </canvas>
+    
+        <div>
+            <p>
+                Score: 
+            </p>
+            <p id="score">
+                10
+            </p>
+        </div>
+    </div>
+    
 
 
     <script src="script.js"></script>
