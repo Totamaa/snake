@@ -238,7 +238,7 @@
 			if (nbSnakeSlow === 0)
 			{
 				console.log("avant: " + snakeSpeed);
-				snakeSpeed *= 1.25;
+				snakeSpeed *= 0.6;
 				clearInterval(intervalId);
 				console.log("après: " + snakeSpeed);
 				intervalId = setInterval(loopGame, snakeSpeed);
@@ -317,9 +317,7 @@
 		{
 			// slow a bit
 			nbSnakeSlow += 15;
-			console.log("avant: " + snakeSpeed);
-			snakeSpeed *= 0.8;
-			console.log("après: " + snakeSpeed);
+			snakeSpeed *= (100 / 60);
 			clearInterval(intervalId);
 			intervalId = setInterval(loopGame, snakeSpeed);
 			generateFood();
@@ -449,7 +447,7 @@
 		let eltSpawn = APPLE;
 		if (BONUSMALUS.checked)
 		{
-			let randomElement = Math.floor(Math.random() * 12);
+			let randomElement = Math.floor(Math.random() * 9);
 			if (randomElement === 0 && snakeBody.length > 3)
 			{
 				eltSpawn = MUSHROOM;
