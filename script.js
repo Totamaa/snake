@@ -10,7 +10,10 @@
 	const INPUTCOLOR = document.getElementById("colorSnake");
 	const CANVAS = document.getElementById("boardGame");
 	const GAMEPAGE = document.getElementById("gamePage");
-	const FORMPARA = document.getElementById("paraPage");
+	const PARAPAGE = document.getElementById("paraPage");
+	const BESTSCORE = document.getElementById("bestScore");
+	const SCORE = document.getElementById("score");
+	const LASTSCORE = document.getElementById("lastScore");
 
 	// MAP
 	const CASESIDE = 20; // size of one case in px
@@ -25,13 +28,25 @@
 	// SNAKE
 	let snakeBody; // tab of snake position
 	let snakeDirection = [1, 0]; // direction vecteur of the snake
-	let foodEat = false;
+	let tempDirection = [1, 0];
 
 	// COLOR
 	const RED = "#FF0000";
 	const GREY = "#555555";
 	const WHITE = "#FFFFFF";
-	const LIGHTGREY = "#AAAAAA";
+	const LIGHTGREY = "#CCCCCC";
+
+	// score
+	let scoreValue = 0;
+
+	if (localStorage.getItem("bestScore"))
+	{
+		BESTSCORE.textContent = localStorage.getItem("bestScore");
+	}
+	else
+	{
+		BESTSCORE.textContent = 0;
+	}
 	
 	// play
 	let intervalId;
@@ -44,7 +59,11 @@
 	{
 		// init the game
 		GAMEPAGE.classList.toggle("hidden");
-		FORMPARA.classList.toggle("hidden");
+		PARAPAGE.classList.toggle("hidden");
+		snakeDirection = [1, 0];
+
+		scoreValue = 0;
+		SCORE.textContent = scoreValue;
 
 		document.addEventListener("keydown", moveDirection);
 
@@ -61,13 +80,15 @@
 					let levels = levelsJson.levels;
 					for (let level of levels)
 					{
-						if (level.level == levelChose)
+						if (level.level === parseInt(levelChose))
 						{
 							levelJson = level;
 						}
 					}
 					initGrid(levelJson);
-					intervalId = setInterval(loopGame, levelJson.delay);
+					setTimeout(function(){
+						intervalId = setInterval(loopGame, levelJson.delay);
+					}, 500);
 				}
 				else
 				{
@@ -87,6 +108,7 @@
 		// empty grid
 		world = [];
 		snakeBody = [];
+		
 		sizeGrid = levelJson.dimension;
 		for (let i = 0; i < sizeGrid; i++)
 		{
@@ -125,32 +147,33 @@
 		for (let i = 0; i < nbWall; i++)
 		{
 			// case vide
-			let x = Math.floor(Math.random() * sizeGrid);
-			let y = Math.floor(Math.random() * sizeGrid);
-			let casesSide = [[x+1, y], [x-1, y], [x, y+1], [x, y-1]];
-			let caseSideFree = true;
-			for (let caseSide of casesSide)
-			{
-				if (caseSide[0] >= 0 && caseSide[0] < sizeGrid && caseSide[1] >= 0 && caseSide[1] < sizeGrid)
-				{
-					if (world[caseSide[0]][caseSide[1]] !== EMPTY)
-					{
-						caseSideFree = false;
-					}
-				}
-			}
+			let x;
+			let y;
+			let caseSideFree;
 
-			while (world[x][y] !== EMPTY && !caseSideFree)
+			do
 			{
 				x = Math.floor(Math.random() * sizeGrid);
 				y = Math.floor(Math.random() * sizeGrid);
-			}
+				let casesSide = [[x+1, y], [x-1, y], [x, y+1], [x, y-1]];
+				caseSideFree = true;
+				for (let caseSide of casesSide)
+				{
+					if (isInGrid(caseSide))
+					{
+						if (world[caseSide[0]][caseSide[1]] !== EMPTY)
+						{
+							caseSideFree = false;
+						}
+					}
+				}
+			} while (world[x][y] !== EMPTY && !caseSideFree);
 
 			world[x][y] = WALL;
 		}
 
 		// apple
-		generateApple(levelJson.dimension);
+		generateApple();
 
 		// draw the board
 		CANVAS.setAttribute("width", sizeGrid * CASESIDE);
@@ -162,6 +185,7 @@
 
 	function loopGame()
 	{
+		tempDirection = snakeDirection;
 		let snakeHead = [snakeBody[snakeBody.length - 1][0], snakeBody[snakeBody.length - 1][1]];
 		if (snakeDirection[0] === 1)
 		{
@@ -184,61 +208,68 @@
 
 		snakeHead = [snakeBody[snakeBody.length - 1][0], snakeBody[snakeBody.length - 1][1]];
 
-		if (snakeHead[0] > sizeGrid - 1 || snakeHead[1] > sizeGrid - 1 || snakeHead[0] < 0 || snakeHead[1] < 0)
+		if (!isInGrid(snakeHead))
 		{
 			endGame();
 		}
 		if (world[snakeHead[0]][snakeHead[1]] === SNAKE || world[snakeHead[0]][snakeHead[1]] === WALL)
 		{
-			endGame();	
+			endGame();
 		}
 		if (world[snakeHead[0]][snakeHead[1]] === FOOD)
 		{
 			generateApple();
+			scoreValue ++;
+			SCORE.textContent = scoreValue;
 		}
 		else
 		{
 			snakeBody.shift();
 		}
-
 		putSnakeOnWorld(snakeTail);
 		drawCanva();
 	}
 
 	function endGame()
 	{
+		LASTSCORE.textContent = scoreValue;
+		if (scoreValue > BESTSCORE.textContent)
+		{
+			BESTSCORE.textContent = scoreValue;
+			localStorage.setItem("bestScore", scoreValue);
+		}
 		clearInterval(intervalId);
 		GAMEPAGE.classList.toggle("hidden");
-		FORMPARA.classList.toggle("hidden");
+		PARAPAGE.classList.toggle("hidden");
 	}
 
 	function moveDirection(evt)
 	{
 		let touch = evt.key;
-		if (touch === "ArrowUp")
+		if (touch === "ArrowUp" || touch === "z")
 		{
-			if (snakeDirection[1] !== 1)
+			if (tempDirection[1] !== 1)
 			{
 				snakeDirection = [0, -1];
 			}
 		}
-		else if (touch === "ArrowDown")
+		else if (touch === "ArrowDown" || touch === "s")
 		{
-			if (snakeDirection[1] !== -1)
+			if (tempDirection[1] !== -1)
 			{
 				snakeDirection = [0, 1];
 			}
 		}
-		else if (touch === "ArrowRight")
+		else if (touch === "ArrowRight" || touch === "d")
 		{
-			if (snakeDirection[0] !== -1)
+			if (tempDirection[0] !== -1)
 			{
 				snakeDirection = [1, 0];
 			}
 		}
-		else if (touch === "ArrowLeft")
+		else if (touch === "ArrowLeft" || touch === "q")
 		{
-			if (snakeDirection[0] !== 1)
+			if (tempDirection[0] !== 1)
 			{
 				snakeDirection = [-1, 0];
 			}
@@ -247,13 +278,35 @@
 	
 	function generateApple()
 	{
-		let x = Math.floor(Math.random() * sizeGrid);
-		let y = Math.floor(Math.random() * sizeGrid);
-		while (world[x][y] !== EMPTY)
+		let x;
+		let y;
+		let applePossible;
+		do
 		{
 			x = Math.floor(Math.random() * sizeGrid);
 			y = Math.floor(Math.random() * sizeGrid);
-		}
+			let casesSide = [[x+1, y], [x-1, y], [x, y+1], [x, y-1]];
+			let nbSquareEmpty = 0;
+			for (let square of casesSide)
+			{
+				if (isInGrid(square))
+				{
+					if (world[square[0]][square[1]] === EMPTY)
+					{
+						nbSquareEmpty ++;
+					}
+				}
+			}
+			if (nbSquareEmpty <= 1)
+			{
+				applePossible = false;
+			}
+			else
+			{
+				applePossible = true;
+			}
+			
+		} while (world[x][y] !== EMPTY && applePossible);
 
 		world[x][y] = FOOD;
 	}
@@ -311,6 +364,21 @@
 		}
 		world[snakeTail[0]][snakeTail[1]] = EMPTY;
 	}
+
+	function isInGrid(square)
+	{
+		let x = square[0];
+		let y = square[1];
+		if (x < 0 || x >= sizeGrid || y < 0 || y >= sizeGrid)
+		{
+			return false;
+		}
+		else
+		{
+			return true;
+		}
+	}
+
 
 })();
 		

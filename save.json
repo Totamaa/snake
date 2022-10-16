@@ -17,6 +17,18 @@
             "dimension": 10,
             "delay": 150,
             "walls": 5
+        },
+        {
+            "level" : 4,
+            "dimension": 20,
+            "delay": 75,
+            "walls": 0
+        },
+        {
+            "level" : 5,
+            "dimension": 20,
+            "delay": 200,
+            "walls": 50
         }
     ]
 }

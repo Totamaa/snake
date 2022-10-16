@@ -7,49 +7,57 @@
 </head>
 
 <body>
-    <!-- paramètres du jeu -->
     <h1>Snake</h1>
-    <div id="paraPage">
-        <div id="paras">
-            <div id="formLevel">
-                <label for="level">Niveau
-                    <br />
-                    <input type="number" name="level" id="level" min="1" max="3" step="1" value="1">
-                </label>
-            </div>
     
-            <div id="formColorSnake">
-                <label for="colorSnake">Couleur du serpent
-                    <br />
-                    <input type="color" name="colorSnake" id="colorSnake" value="#00FF00">
-                </label>
-            </div>
-        </div>
-        <br />
-        <div id="formButtonPlay">
-            <button>Jouer</button>
-        </div>
-        <div id="score">
-            <p class="itemScore">Dernier score</p>
-            <p id="lastScore" class="itemScore">0</p>
-            <p class="itemScore">Meilleur score</p>
-            <p id="bestScore" class="itemScore">0</p>
-        </div>
-    </div>
+    <div id="page">
 
-    <!-- jeu -->
-    <div id="gamePage" class="hidden">
-        <canvas id="boardGame" width="" height="">
+        <!-- game -->
+        <div id="game">
+
+            <!-- parameter of the game -->
+            <div id="paraPage">
+                <div id="paras">
+                    <div id="formLevel">
+                        <label for="level">Niveau
+                            <br />
+                            <input type="number" name="level" id="level" min="1" max="5" step="1" value="1">
+                        </label>
+                    </div>
+            
+                    <div id="formColorSnake">
+                        <label for="colorSnake">Couleur du serpent
+                            <br />
+                            <input type="color" name="colorSnake" id="colorSnake" value="#00FF00">
+                        </label>
+                    </div>
+                </div>
+                <br />
+                <div id="formButtonPlay">
+                    <button>Jouer</button>
+                </div>
+                
+            </div>
         
-        </canvas>
+            <!-- board game -->
+            <div id="gamePage" class="hidden">
+                <canvas id="boardGame" width="0" height="0"></canvas>
+                <p>
+                    Score:  
+                </p>
+                <br />
+                <p id="score">
+                    0
+                </p>
+            </div>
+
+        </div>
     
+        <!-- Score -->
         <div>
-            <p>
-                Score: 
-            </p>
-            <p id="score">
-                10
-            </p>
+                <p class="itemScore">Dernier score</p>
+                <p id="lastScore" class="itemScore">0</p>
+                <p class="itemScore">Meilleur score</p>
+                <p id="bestScore" class="itemScore">0</p>
         </div>
     </div>
     
