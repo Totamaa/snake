@@ -29,6 +29,12 @@
             "dimension": 20,
             "delay": 200,
             "walls": 50
+        },
+        {
+            "level" : 6,
+            "dimension": 3,
+            "delay": 200,
+            "walls": 1
         }
     ]
 }
