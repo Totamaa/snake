@@ -14,21 +14,42 @@
 	const BESTSCORE = document.getElementById("bestScore");
 	const SCORE = document.getElementById("score");
 	const LASTSCORE = document.getElementById("lastScore");
+	const BONUSMALUS = document.getElementById("bonusMalus");
+
+	// IMG
+	const IMGAPPLE = new Image();
+	IMGAPPLE.src = "assets/apple.png";
+	const IMGMUSHROOM = new Image();
+	IMGMUSHROOM.src = "assets/mushroom.png";
+	const IMGPICKAXE = new Image();
+	IMGPICKAXE.src = "assets/pickaxe.png";
+	const IMGSNAIL = new Image();
+	IMGSNAIL.src = "assets/slow.png";
+	const IMGWALL = new Image();
+	IMGWALL.src = "assets/wall.png";
 
 	// MAP
-	const CASESIDE = 20; // size of one case in px
+	const CASESIDE = 30; // size of one case in px
 	const EMPTY = 0;
 	const SNAKE = 1;
-	const FOOD = 2;
+	const APPLE = 2;
 	const WALL = 3;
+	const MUSHROOM = 4;
+	const PICKAXE = 5;
+	const SNAIL = 6;
 	let world; // map of the world
 	let sizeGrid;
 	let ctx;
+	let nbBeforeChangeMax;
+	let nbBeforeChange;
+	let tabWall;
 
 	// SNAKE
 	let snakeBody; // tab of snake position
 	let snakeDirection; // direction vecteur of the snake
 	let tempDirection; // to avoid snake going back on itself
+	let snakeSpeed;
+	let nbSnakeSlow;
 
 	// COLOR
 	const RED = "#FF0000";
@@ -63,6 +84,10 @@
 		// init snake direction
 		snakeDirection = [1, 0];
 		tempDirection = [1, 0];
+		nbSnakeSlow = 0;
+
+		nbBeforeChangeMax = 30;
+		nbBeforeChange = nbBeforeChangeMax;
 
 		// init score
 		scoreValue = 0;
@@ -96,7 +121,8 @@
 					initGrid(levelJson);
 					// wait 0.5s before lunch the game
 					setTimeout(function(){
-						intervalId = setInterval(loopGame, levelJson.delay);
+						snakeSpeed = levelJson.delay;
+						intervalId = setInterval(loopGame, snakeSpeed);
 					}, 500);
 				}
 				else
@@ -121,6 +147,7 @@
 		// empty grid
 		world = [];
 		snakeBody = [];
+		tabWall = [];
 		sizeGrid = levelJson.dimension;
 		for (let i = 0; i < sizeGrid; i++)
 		{
@@ -156,7 +183,6 @@
 
 		// init walls
 		let nbWall = levelJson.walls;
-		console.log(snakeBody);
 		for (let i = 0; i < nbWall; i++)
 		{
 			let x;
@@ -169,8 +195,6 @@
 				y = Math.floor(Math.random() * sizeGrid);
 				let casesSide = [[x+1, y], [x-1, y], [x, y+1], [x, y-1]];
 				caseSideFree = true;
-				console.log(x, y);
-				console.log(casesSide);
 				for (let caseSide of casesSide)
 				{
 					if (isInGrid(caseSide))
@@ -185,10 +209,11 @@
 
 			// put the valid wall on the map
 			world[x][y] = WALL;
+			tabWall.push([x, y]);
 		}
 
-		// apple
-		generateApple();
+		// food
+		generateFood();
 
 		// draw the board
 		CANVAS.setAttribute("width", sizeGrid * CASESIDE);
@@ -205,6 +230,20 @@
 	{
 		tempDirection = snakeDirection;
 		let snakeHead = [snakeBody[snakeBody.length - 1][0], snakeBody[snakeBody.length - 1][1]];
+
+		// speed
+		if (nbSnakeSlow > 0)
+		{
+			nbSnakeSlow--;
+			if (nbSnakeSlow === 0)
+			{
+				console.log("avant: " + snakeSpeed);
+				snakeSpeed *= 1.25;
+				clearInterval(intervalId);
+				console.log("après: " + snakeSpeed);
+				intervalId = setInterval(loopGame, snakeSpeed);
+			}
+		}
 
 		// update the snakeBody
 		if (snakeDirection[0] === 1)
@@ -224,7 +263,7 @@
 			snakeBody.push([snakeHead[0], snakeHead[1] - 1]);
 		}
 
-		let snakeTail = snakeBody[0];
+		let snakeTail = [snakeBody[0]];
 		snakeHead = [snakeBody[snakeBody.length - 1][0], snakeBody[snakeBody.length - 1][1]];
 
 		// look ig the snake is on smthg
@@ -238,16 +277,70 @@
 		{
 			endGame();
 		}
-			// ie he's on food
-		if (world[snakeHead[0]][snakeHead[1]] === FOOD)
+			// if he's on food
+		if (world[snakeHead[0]][snakeHead[1]] === APPLE)
 		{
-			generateApple();
+			generateFood();
+			nbBeforeChange = nbBeforeChangeMax;
 			scoreValue ++;
+			SCORE.textContent = scoreValue;
+		}
+		else if (world[snakeHead[0]][snakeHead[1]] === MUSHROOM)
+		{
+			snakeBody.shift();
+			let beforeTail = snakeBody.shift();
+			snakeTail.push(beforeTail);
+			generateFood();
+			nbBeforeChange = nbBeforeChangeMax;
+			scoreValue--;
 			SCORE.textContent = scoreValue;
 		}
 		else
 		{
 			snakeBody.shift();
+		}
+
+		// on bonus
+		if (world[snakeHead[0]][snakeHead[1]] === PICKAXE)
+		{
+			// delete a random wall
+			if (tabWall.length > 0)
+			{
+				let numWall = Math.floor(Math.random() * tabWall.length);
+				let wallDelete = tabWall[numWall];
+				tabWall.splice(numWall);
+				world[wallDelete[0]][wallDelete[1]] = EMPTY;
+			}
+			generateFood();
+		}
+		if (world[snakeHead[0]][snakeHead[1]] === SNAIL)
+		{
+			// slow a bit
+			nbSnakeSlow += 15;
+			console.log("avant: " + snakeSpeed);
+			snakeSpeed *= 0.8;
+			console.log("après: " + snakeSpeed);
+			clearInterval(intervalId);
+			intervalId = setInterval(loopGame, snakeSpeed);
+			generateFood();
+		}
+
+		// change food/bonus
+		nbBeforeChange--;
+		if (nbBeforeChange <= 0)
+		{
+			nbBeforeChange = nbBeforeChangeMax;
+			for (let i = 0; i < sizeGrid; i++)
+			{
+				for (let j = 0; j < sizeGrid; j++)
+				{
+					if (world[i][j] !== SNAKE && world[i][j] !== WALL && world[i][j] !== EMPTY)
+					{
+						world[i][j] = EMPTY;
+					}
+				}
+			}
+			generateFood();
 		}
 
 		// update the world and draw canva
@@ -318,13 +411,13 @@
 	/**
 	 * put an apple on the board
 	 */
-	function generateApple()
+	function generateFood()
 	{
 		let x;
 		let y;
-		let applePossible;
+		let foodPossible;
 
-		// find a valid place for apple
+		// find a valid place for food
 		do
 		{
 			x = Math.floor(Math.random() * sizeGrid);
@@ -343,16 +436,38 @@
 			}
 			if (nbSquareEmpty <= 1)
 			{
-				applePossible = false;
+				foodPossible = false;
 			}
 			else
 			{
-				applePossible = true;
+				foodPossible = true;
 			}
 			
-		} while (world[x][y] !== EMPTY || !applePossible);
+		} while (world[x][y] !== EMPTY || !foodPossible);
 
-		world[x][y] = FOOD;
+		// chose type of the next spawn
+		let eltSpawn = APPLE;
+		if (BONUSMALUS.checked)
+		{
+			let randomElement = Math.floor(Math.random() * 12);
+			if (randomElement === 0 && snakeBody.length > 3)
+			{
+				eltSpawn = MUSHROOM;
+			}
+			else if (randomElement === 1 && tabWall.length > 0)
+			{
+				eltSpawn = PICKAXE;
+			}
+			else if (randomElement === 2)
+			{
+				eltSpawn = SNAIL;
+			}
+			else
+			{
+				eltSpawn = APPLE;
+			}
+		}
+		world[x][y] = eltSpawn;
 	}
 
 	/**
@@ -377,7 +492,7 @@
 					ctx.fillStyle = colorEmpty;
 					ctx.fillRect(i * CASESIDE, j * CASESIDE, CASESIDE, CASESIDE);
 				}
-				if (world[i][j] === SNAKE)
+				else if (world[i][j] === SNAKE)
 				{
 					ctx.fillStyle = colorSnake;
 					ctx.fillRect(i * CASESIDE, j * CASESIDE, CASESIDE, CASESIDE);
@@ -390,15 +505,35 @@
 					}
 					
 				}
-				if (world[i][j] === FOOD)
+				else if (world[i][j] === APPLE)
 				{
-					ctx.fillStyle = colorFood;
+					ctx.fillStyle = colorEmpty;
 					ctx.fillRect(i * CASESIDE, j * CASESIDE, CASESIDE, CASESIDE);
+					ctx.drawImage(IMGAPPLE, i * CASESIDE, j * CASESIDE, CASESIDE, CASESIDE);
 				}
-				if (world[i][j] === WALL)
+				else if (world[i][j] === WALL)
 				{
 					ctx.fillStyle = colorWall;
 					ctx.fillRect(i * CASESIDE, j * CASESIDE, CASESIDE, CASESIDE);
+					ctx.drawImage(IMGWALL, i * CASESIDE, j * CASESIDE, CASESIDE, CASESIDE);
+				}
+				else if (world[i][j] === MUSHROOM)
+				{
+					ctx.fillStyle = colorEmpty;
+					ctx.fillRect(i * CASESIDE, j * CASESIDE, CASESIDE, CASESIDE);
+					ctx.drawImage(IMGMUSHROOM, i * CASESIDE, j * CASESIDE, CASESIDE, CASESIDE);
+				}
+				else if (world[i][j] === PICKAXE)
+				{
+					ctx.fillStyle = colorEmpty;
+					ctx.fillRect(i * CASESIDE, j * CASESIDE, CASESIDE, CASESIDE);
+					ctx.drawImage(IMGPICKAXE, i * CASESIDE, j * CASESIDE, CASESIDE, CASESIDE);
+				}
+				else if (world[i][j] === SNAIL)
+				{
+					ctx.fillStyle = colorEmpty;
+					ctx.fillRect(i * CASESIDE, j * CASESIDE, CASESIDE, CASESIDE);
+					ctx.drawImage(IMGSNAIL, i * CASESIDE, j * CASESIDE, CASESIDE, CASESIDE);
 				}
 			}
 		}
@@ -420,7 +555,10 @@
 		}
 
 		// remove the last snake tail
-		world[snakeTail[0]][snakeTail[1]] = EMPTY;
+		for (let partSnakeTail of snakeTail)
+		{
+			world[partSnakeTail[0]][partSnakeTail[1]] = EMPTY;
+		}
 	}
 
 	/**

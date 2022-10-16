@@ -19,7 +19,7 @@
     justify-content: space-evenly;
 }
 
-#formLevel, #formColorSnake
+.field
 {
     margin: 2vw;
 }
