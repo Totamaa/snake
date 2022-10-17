@@ -1,53 +1,51 @@
-#page
+#paraDiv.hidden, #boardDiv.hidden
 {
-    display: flex;
-    justify-content: space-evenly;
+    display: none;
 }
 
-.hidden
-{
-    visibility: hidden;
-}
-
-
-/* Formulaire paramètre du jeu */
-#paras
-{
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: space-evenly;
-}
-
-.field
-{
-    margin: 2vw;
-}
-
-#formButtonPlay
-{
-    display: flex;
-    justify-content: space-evenly;
-}
-
-#score
+body
 {
     display: flex;
     flex-direction: column;
 }
 
-.itemScore
+h1
 {
     align-self: center;
-    margin: 0;
-    padding-top: 1vh;
 }
-/* Page de jeu */
-#gamePage
+
+/* page and score */
+#page
 {
     display: flex;
+    justify-content: center;   
 }
-#score
+
+/* paras */
+#paraDiv
 {
-    margin-left: 1vw;
+    display: flex;
+    flex-direction: column;
+}
+
+input
+{
+    align-self: center;
+    margin-bottom: 3vh;
+}
+
+label
+{
+    align-self: center;
+}
+
+#playButton
+{
+    align-self: center;
+    margin-top: 2vh;
+}
+
+#scoreSection
+{
+    margin-left: 8vw;
 }

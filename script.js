@@ -6,11 +6,11 @@
 	const JSON_FILE = "save.json";
 	
 	// ELT DOM
-	const BUTTONPLAY = document.getElementById("formButtonPlay");
+	const BUTTONPLAY = document.getElementById("playButton");
 	const INPUTCOLOR = document.getElementById("colorSnake");
 	const CANVAS = document.getElementById("boardGame");
-	const GAMEPAGE = document.getElementById("gamePage");
-	const PARAPAGE = document.getElementById("paraPage");
+	const GAMEDIV = document.getElementById("boardDiv");
+	const PARADIV = document.getElementById("paraDiv");
 	const BESTSCORE = document.getElementById("bestScore");
 	const SCORE = document.getElementById("score");
 	const LASTSCORE = document.getElementById("lastScore");
@@ -29,7 +29,7 @@
 	IMGWALL.src = "assets/wall.png";
 
 	// MAP
-	const CASESIDE = 30; // size of one case in px
+	const CASESIDE = 20; // size of one case in px
 	const EMPTY = 0;
 	const SNAKE = 1;
 	const APPLE = 2;
@@ -43,20 +43,20 @@
 	let nbBeforeChangeMax;
 	let nbBeforeChange;
 	let tabWall;
-
+	
 	// SNAKE
 	let snakeBody; // tab of snake position
 	let snakeDirection; // direction vecteur of the snake
 	let tempDirection; // to avoid snake going back on itself
 	let snakeSpeed;
 	let nbSnakeSlow;
-
+	
 	// COLOR
 	const RED = "#FF0000";
 	const GREY = "#555555";
 	const WHITE = "#FFFFFF";
 	const LIGHTGREY = "#CCCCCC";
-
+	
 	// score
 	let scoreValue = 0;
 	if (localStorage.getItem("bestScore"))
@@ -78,8 +78,9 @@
 	function play()
 	{
 		// change the visibility
-		GAMEPAGE.classList.toggle("hidden");
-		PARAPAGE.classList.toggle("hidden");
+		ctx = CANVAS.getContext('2d');
+		GAMEDIV.classList.toggle("hidden");
+		PARADIV.classList.toggle("hidden");
 
 		// init snake direction
 		snakeDirection = [1, 0];
@@ -123,7 +124,7 @@
 					setTimeout(function(){
 						snakeSpeed = levelJson.delay;
 						intervalId = setInterval(loopGame, snakeSpeed);
-					}, 500);
+					}, 800);
 				}
 				else
 				{
@@ -218,7 +219,6 @@
 		// draw the board
 		CANVAS.setAttribute("width", sizeGrid * CASESIDE);
 		CANVAS.setAttribute("height", sizeGrid * CASESIDE);
-		ctx = CANVAS.getContext('2d');
 		drawCanva();
 		
 	}
@@ -237,10 +237,8 @@
 			nbSnakeSlow--;
 			if (nbSnakeSlow === 0)
 			{
-				console.log("avant: " + snakeSpeed);
 				snakeSpeed *= 0.6;
 				clearInterval(intervalId);
-				console.log("après: " + snakeSpeed);
 				intervalId = setInterval(loopGame, snakeSpeed);
 			}
 		}
@@ -272,78 +270,85 @@
 		{
 			endGame();
 		}
-			// if he's on the wall or on itself
-		if (world[snakeHead[0]][snakeHead[1]] === SNAKE || world[snakeHead[0]][snakeHead[1]] === WALL)
-		{
-			endGame();
-		}
-			// if he's on food
-		if (world[snakeHead[0]][snakeHead[1]] === APPLE)
-		{
-			generateFood();
-			nbBeforeChange = nbBeforeChangeMax;
-			scoreValue ++;
-			SCORE.textContent = scoreValue;
-		}
-		else if (world[snakeHead[0]][snakeHead[1]] === MUSHROOM)
-		{
-			snakeBody.shift();
-			let beforeTail = snakeBody.shift();
-			snakeTail.push(beforeTail);
-			generateFood();
-			nbBeforeChange = nbBeforeChangeMax;
-			scoreValue--;
-			SCORE.textContent = scoreValue;
-		}
 		else
 		{
-			snakeBody.shift();
-		}
-
-		// on bonus
-		if (world[snakeHead[0]][snakeHead[1]] === PICKAXE)
-		{
-			// delete a random wall
-			if (tabWall.length > 0)
+				// if he's on the wall or on itself
+			if ((world[snakeHead[0]][snakeHead[1]] === SNAKE && world[snakeHead[0]][snakeHead[1]] !== snakeTail)|| world[snakeHead[0]][snakeHead[1]] === WALL)
 			{
-				let numWall = Math.floor(Math.random() * tabWall.length);
-				let wallDelete = tabWall[numWall];
-				tabWall.splice(numWall);
-				world[wallDelete[0]][wallDelete[1]] = EMPTY;
+				endGame();
 			}
-			generateFood();
-		}
-		if (world[snakeHead[0]][snakeHead[1]] === SNAIL)
-		{
-			// slow a bit
-			nbSnakeSlow += 15;
-			snakeSpeed *= (100 / 60);
-			clearInterval(intervalId);
-			intervalId = setInterval(loopGame, snakeSpeed);
-			generateFood();
-		}
-
-		// change food/bonus
-		nbBeforeChange--;
-		if (nbBeforeChange <= 0)
-		{
-			nbBeforeChange = nbBeforeChangeMax;
-			for (let i = 0; i < sizeGrid; i++)
+				// if he's on food
+			else if (world[snakeHead[0]][snakeHead[1]] === APPLE)
 			{
-				for (let j = 0; j < sizeGrid; j++)
+				generateFood();
+				nbBeforeChange = nbBeforeChangeMax;
+				scoreValue ++;
+				SCORE.textContent = scoreValue;
+			}
+			else if (world[snakeHead[0]][snakeHead[1]] === MUSHROOM)
+			{
+				snakeBody.shift();
+				let beforeTail = snakeBody.shift();
+				snakeTail.push(beforeTail);
+				generateFood();
+				nbBeforeChange = nbBeforeChangeMax;
+				scoreValue--;
+				SCORE.textContent = scoreValue;
+			}
+			else
+			{
+				snakeBody.shift();
+			}
+
+			// on bonus
+			if (world[snakeHead[0]][snakeHead[1]] === PICKAXE)
+			{
+				// delete a random wall
+				if (tabWall.length > 0)
 				{
-					if (world[i][j] !== SNAKE && world[i][j] !== WALL && world[i][j] !== EMPTY)
+					let numWall = Math.floor(Math.random() * tabWall.length);
+					let wallDelete = tabWall[numWall];
+					tabWall.splice(numWall);
+					nbBeforeChange = nbBeforeChangeMax;
+					world[wallDelete[0]][wallDelete[1]] = EMPTY;
+				}
+				generateFood();
+			}
+			else if (world[snakeHead[0]][snakeHead[1]] === SNAIL)
+			{
+				// slow a bit
+				nbSnakeSlow += 15;
+				snakeSpeed *= (100 / 60);
+				clearInterval(intervalId);
+				nbBeforeChange = nbBeforeChangeMax;
+				intervalId = setInterval(loopGame, snakeSpeed);
+				generateFood();
+			}
+
+			// change food/bonus
+			nbBeforeChange--;
+			if (nbBeforeChange <= 0)
+			{
+				nbBeforeChange = nbBeforeChangeMax;
+				for (let i = 0; i < sizeGrid; i++)
+				{
+					for (let j = 0; j < sizeGrid; j++)
 					{
-						world[i][j] = EMPTY;
+						if (world[i][j] !== SNAKE && world[i][j] !== WALL && world[i][j] !== EMPTY)
+						{
+							world[i][j] = EMPTY;
+						}
 					}
 				}
+				generateFood();
 			}
-			generateFood();
+			
+			putSnakeOnWorld(snakeTail);
 		}
 
 		// update the world and draw canva
-		putSnakeOnWorld(snakeTail);
 		drawCanva();
+
 	}
 
 	/**
@@ -361,10 +366,9 @@
 
 		// clear canva and change page visibility
 		clearInterval(intervalId);
-		GAMEPAGE.classList.toggle("hidden");
-		PARAPAGE.classList.toggle("hidden");
+		GAMEDIV.classList.toggle("hidden");
+		PARADIV.classList.toggle("hidden");
 	}
-
 
 	/**
 	 * update snakeDirection with the good direction

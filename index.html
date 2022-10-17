@@ -9,66 +9,45 @@
 <body>
     <h1>Snake</h1>
     
-    <div id="page">
+    <section id="page">
 
         <!-- game -->
-        <div id="game">
+        <div id="gameSection">
 
             <!-- parameter of the game -->
-            <div id="paraPage">
-                <div id="paras">
-                    <div id="formLevel" class="field">
-                        <label for="level">Niveau
-                            <br />
-                            <input type="number" name="level" id="level" min="1" max="5" step="1" value="1">
-                        </label>
-                    </div>
+            <div id="paraDiv">
+                    <label for="level" class="field">Niveau</label>
+                    <input type="number" name="level" id="level" min="1" max="5" step="1" value="1">
             
-                    <div id="formColorSnake" class="field">
-                        <label for="colorSnake">Couleur du serpent
-                            <br />
-                            <input type="color" name="colorSnake" id="colorSnake" value="#00FF00">
-                        </label>
-                    </div>
+                    <label for="colorSnake" class="field">Couleur du serpent</label>
+                    <input type="color" name="colorSnake" id="colorSnake" value="#00FF00">
 
-                    <label for="bonusMalus" class="field">
-                        Activer les bonus/malus
-                        <br />
-                        <input type="checkbox" name="bonusMalus" id="bonusMalus">
-                    </label>
-                </div>
-                <br />
-                <div id="formButtonPlay">
-                    <button>Jouer</button>
-                </div>
-                
+                    <label for="bonusMalus" class="field">Activer les bonus/malus</label>
+                    <input type="checkbox" name="bonusMalus" id="bonusMalus">
+                <button id="playButton">Jouer</button>
             </div>
         
             <!-- board game -->
-            <div id="gamePage" class="hidden">
-                <canvas id="boardGame" width="0" height="0"></canvas>
+            <div id="boardDiv" class="hidden">
                 <p>
                     Score:  
                 </p>
-                <br />
                 <p id="score">
                     0
                 </p>
+                <canvas id="boardGame" width="0" height="0"></canvas>
             </div>
 
         </div>
     
         <!-- Score -->
-        <div>
-                <p class="itemScore">Dernier score</p>
-                <p id="lastScore" class="itemScore">0</p>
-                <p class="itemScore">Meilleur score</p>
-                <p id="bestScore" class="itemScore">0</p>
+        <div id="scoreSection">
+                <p class="itemScore">Dernier score : <a id="lastScore" class="itemScore">0</a></p>
+                <p class="itemScore">Meilleur score:  <a id="bestScore" class="itemScore">0</a></p>
+                
         </div>
-    </div>
+    </section>
     
-
-
     <script src="script.js"></script>
 </body>
 </html>
