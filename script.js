@@ -277,7 +277,7 @@
 			{
 				endGame();
 			}
-				// if he's on food
+				// if he's on apple
 			else if (world[snakeHead[0]][snakeHead[1]] === APPLE)
 			{
 				generateFood();
@@ -285,6 +285,7 @@
 				scoreValue ++;
 				SCORE.textContent = scoreValue;
 			}
+				// if he's on Mushroom
 			else if (world[snakeHead[0]][snakeHead[1]] === MUSHROOM)
 			{
 				snakeBody.shift();
@@ -317,8 +318,11 @@
 			else if (world[snakeHead[0]][snakeHead[1]] === SNAIL)
 			{
 				// slow a bit
+				if (nbSnakeSlow === 0)
+				{
+					snakeSpeed *= (100 / 60);
+				}
 				nbSnakeSlow += 15;
-				snakeSpeed *= (100 / 60);
 				clearInterval(intervalId);
 				nbBeforeChange = nbBeforeChangeMax;
 				intervalId = setInterval(loopGame, snakeSpeed);
