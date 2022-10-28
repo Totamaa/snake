@@ -56,7 +56,9 @@
 	const GREY = "#555555";
 	const WHITE = "#FFFFFF";
 	const LIGHTGREY = "#CCCCCC";
-	
+	const YELLOWGREEN = "#ADBF24";
+	const GREEN = "#76b42d";
+
 	// score
 	let scoreValue = 0;
 	if (localStorage.getItem("bestScore"))
@@ -486,16 +488,27 @@
 		let colorSnake = INPUTCOLOR.value;
 		let colorFood = RED;
 		let colorWall = GREY;
-		let colorEmpty = LIGHTGREY;
+		let colorEmptyOdd = YELLOWGREEN;
+		let colorEmptyEven = GREEN;
 
 		// color each square of world
 		for (let i = 0; i < sizeGrid; i++)
 		{
 			for (let j = 0; j < sizeGrid; j++)
 			{
+				let colorCase;
+				if ((i + j) % 2 === 0)
+				{
+					colorCase = colorEmptyOdd;
+				}
+				else
+				{
+					colorCase = colorEmptyEven;
+				}
+
 				if (world[i][j] === EMPTY)
 				{
-					ctx.fillStyle = colorEmpty;
+					ctx.fillStyle = colorCase;
 					ctx.fillRect(i * CASESIDE, j * CASESIDE, CASESIDE, CASESIDE);
 				}
 				else if (world[i][j] === SNAKE)
@@ -513,7 +526,7 @@
 				}
 				else if (world[i][j] === APPLE)
 				{
-					ctx.fillStyle = colorEmpty;
+					ctx.fillStyle = colorCase;
 					ctx.fillRect(i * CASESIDE, j * CASESIDE, CASESIDE, CASESIDE);
 					ctx.drawImage(IMGAPPLE, i * CASESIDE, j * CASESIDE, CASESIDE, CASESIDE);
 				}
@@ -525,19 +538,19 @@
 				}
 				else if (world[i][j] === MUSHROOM)
 				{
-					ctx.fillStyle = colorEmpty;
+					ctx.fillStyle = colorCase;
 					ctx.fillRect(i * CASESIDE, j * CASESIDE, CASESIDE, CASESIDE);
 					ctx.drawImage(IMGMUSHROOM, i * CASESIDE, j * CASESIDE, CASESIDE, CASESIDE);
 				}
 				else if (world[i][j] === PICKAXE)
 				{
-					ctx.fillStyle = colorEmpty;
+					ctx.fillStyle = colorCase;
 					ctx.fillRect(i * CASESIDE, j * CASESIDE, CASESIDE, CASESIDE);
 					ctx.drawImage(IMGPICKAXE, i * CASESIDE, j * CASESIDE, CASESIDE, CASESIDE);
 				}
 				else if (world[i][j] === SNAIL)
 				{
-					ctx.fillStyle = colorEmpty;
+					ctx.fillStyle = colorCase;
 					ctx.fillRect(i * CASESIDE, j * CASESIDE, CASESIDE, CASESIDE);
 					ctx.drawImage(IMGSNAIL, i * CASESIDE, j * CASESIDE, CASESIDE, CASESIDE);
 				}

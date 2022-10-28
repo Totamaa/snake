@@ -7,6 +7,12 @@ body
 {
     display: flex;
     flex-direction: column;
+    background-color: darkgreen;
+}
+
+label, p, h1
+{
+    color: lightgreen;
 }
 
 h1
