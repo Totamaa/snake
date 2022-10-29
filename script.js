@@ -15,6 +15,9 @@
 	const SCORE = document.getElementById("score");
 	const LASTSCORE = document.getElementById("lastScore");
 	const BONUSMALUS = document.getElementById("bonusMalus");
+	const PSEUDO = document.getElementById("pseudo");
+	const PSEUDOBESTSCORE = document.getElementById("pseudoBestScore");
+	const PARAPSEUDO = document.getElementById("paraPseudo");
 
 	// IMG
 	const IMGAPPLE = new Image();
@@ -63,10 +66,14 @@
 	let scoreValue = 0;
 	if (localStorage.getItem("bestScore"))
 	{
-		BESTSCORE.textContent = localStorage.getItem("bestScore");
+		let scoreObject = JSON.parse(localStorage.getItem("bestScore"));
+		BESTSCORE.textContent = scoreObject.score;
+		PSEUDOBESTSCORE.textContent = scoreObject.pseudo;
+		PARAPSEUDO.classList.remove("hidden");
 	}
 	else
 	{
+		PARAPSEUDO.classList.add("hidden");
 		BESTSCORE.textContent = 0;
 	}
 	
@@ -79,65 +86,72 @@
 	 */
 	function play()
 	{
-		// change the visibility
-		ctx = CANVAS.getContext('2d');
-		GAMEDIV.classList.toggle("hidden");
-		PARADIV.classList.toggle("hidden");
+		if (PSEUDO.value !== "")
+		{
+			// change the visibility
+			ctx = CANVAS.getContext('2d');
+			GAMEDIV.classList.toggle("hidden");
+			PARADIV.classList.toggle("hidden");
 
-		// init snake direction
-		snakeDirection = [1, 0];
-		tempDirection = [1, 0];
-		nbSnakeSlow = 0;
+			// init snake direction
+			snakeDirection = [1, 0];
+			tempDirection = [1, 0];
+			nbSnakeSlow = 0;
 
-		nbBeforeChangeMax = 30;
-		nbBeforeChange = nbBeforeChangeMax;
+			nbBeforeChangeMax = 30;
+			nbBeforeChange = nbBeforeChangeMax;
 
-		// init score
-		scoreValue = 0;
-		SCORE.textContent = scoreValue;
+			// init score
+			scoreValue = 0;
+			SCORE.textContent = scoreValue;
 
-		// look key for direction
-		document.addEventListener("keydown", moveDirection);
+			// look key for direction
+			document.addEventListener("keydown", moveDirection);
 
-		// read JSon
-		let levelJson;
-		(async function(){
-			try
-			{
-				let jsonFile = await fetch(JSON_FILE);
-
-				if (jsonFile.ok)
+			// read JSon
+			let levelJson;
+			(async function(){
+				try
 				{
-					let levelsJson = await jsonFile.json();
-					
-					// find the good level
-					let levelChose = document.getElementById("level").value;
-					let levels = levelsJson.levels;
-					for (let level of levels)
+					let jsonFile = await fetch(JSON_FILE);
+
+					if (jsonFile.ok)
 					{
-						if (level.level === parseInt(levelChose))
+						let levelsJson = await jsonFile.json();
+						
+						// find the good level
+						let levelChose = document.getElementById("level").value;
+						let levels = levelsJson.levels;
+						for (let level of levels)
 						{
-							levelJson = level;
+							if (level.level === parseInt(levelChose))
+							{
+								levelJson = level;
+							}
 						}
+						// the game
+						initGrid(levelJson);
+						// wait 0.5s before lunch the game
+						setTimeout(function(){
+							snakeSpeed = levelJson.delay;
+							intervalId = setInterval(loopGame, snakeSpeed);
+						}, 800);
 					}
-					// the game
-					initGrid(levelJson);
-					// wait 0.5s before lunch the game
-					setTimeout(function(){
-						snakeSpeed = levelJson.delay;
-						intervalId = setInterval(loopGame, snakeSpeed);
-					}, 800);
+					else
+					{
+						throw("Err " + jsonFile.status);
+					}
 				}
-				else
+				catch(e)
 				{
-					throw("Err " + jsonFile.status);
+					console.log(e);
 				}
-			}
-			catch(e)
-			{
-				console.log(e);
-			}
-		})();
+			})();
+		}
+		else
+		{
+			PSEUDO.value = prompt("Entrez votre pseudo");
+		}
 	}
 
 	/**
@@ -367,7 +381,14 @@
 		if (scoreValue > BESTSCORE.textContent)
 		{
 			BESTSCORE.textContent = scoreValue;
-			localStorage.setItem("bestScore", scoreValue);
+			PSEUDOBESTSCORE.textContent = PSEUDO.value;
+			PARAPSEUDO.classList.remove("hidden");
+
+			let jsonString = {
+				"score": scoreValue,
+				"pseudo": PSEUDO.value
+			};
+			localStorage.setItem("bestScore", JSON.stringify(jsonString));
 		}
 
 		// clear canva and change page visibility

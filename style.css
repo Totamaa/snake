@@ -1,4 +1,4 @@
-#paraDiv.hidden, #boardDiv.hidden
+#paraDiv.hidden, #boardDiv.hidden, .hidden
 {
     display: none;
 }

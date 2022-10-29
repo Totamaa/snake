@@ -16,14 +16,17 @@
 
             <!-- parameter of the game -->
             <div id="paraDiv">
-                    <label for="level" class="field">Niveau</label>
-                    <input type="number" name="level" id="level" min="1" max="5" step="1" value="1">
-            
-                    <label for="colorSnake" class="field">Couleur du serpent</label>
-                    <input type="color" name="colorSnake" id="colorSnake" value="#00FF00">
+                <label for="pseudo" class="field">Pseudo</label>
+                <input type="text" name="pseudo" id="pseudo">
 
-                    <label for="bonusMalus" class="field">Activer les bonus/malus</label>
-                    <input type="checkbox" name="bonusMalus" id="bonusMalus">
+                <label for="level" class="field">Niveau</label>
+                <input type="number" name="level" id="level" min="1" max="5" step="1" value="1">
+        
+                <label for="colorSnake" class="field">Couleur du serpent</label>
+                <input type="color" name="colorSnake" id="colorSnake" value="#00FF00">
+
+                <label for="bonusMalus" class="field">Activer les bonus/malus</label>
+                <input type="checkbox" name="bonusMalus" id="bonusMalus">
                 <button id="playButton">Jouer</button>
             </div>
         
@@ -42,9 +45,9 @@
     
         <!-- Score -->
         <div id="scoreSection">
-                <p class="itemScore">Dernier score : <a id="lastScore" class="itemScore">0</a></p>
-                <p class="itemScore">Meilleur score:  <a id="bestScore" class="itemScore">0</a></p>
-                
+                <p> Dernier score : <span id="lastScore">0</span></p>
+                <p> Meilleur score:  <span id="bestScore">0</span></p>
+                <p id="paraPseudo" class="hidden"> Réalisé par: <span id="pseudoBestScore"></span></p>
         </div>
     </section>
     
