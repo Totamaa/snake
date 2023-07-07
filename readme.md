@@ -17,9 +17,7 @@ A snake game in javascript
 ## **Install and Run**
 You can test at [this link](https://www.games.matteo-calderaro.com) (maybe not the last version) or 
 * clone this repo
-* open the folder with vscode
-* install "live server" vscode extension
-* go in live and play
+* open index.html and enjoy !
 
 ## **Credis**
 this project was done in javascript class:
