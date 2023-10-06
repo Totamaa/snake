@@ -15,7 +15,6 @@ A snake game in javascript
 - There are image for pickaxe, mushroom, snail and apple. 
 
 ## **Install and Run**
-You can test at [this link](https://www.games.matteo-calderaro.com) (maybe not the last version) or 
 * clone this repo
 * open index.html and enjoy !
 
